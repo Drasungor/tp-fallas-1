@@ -1,4 +1,6 @@
 import os
+from rule_engine import Rule
+# import rule_engine
 import uvicorn
 
 from fastapi import FastAPI, Depends, Request
@@ -15,6 +17,20 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*']
 )
+
+# TODO LO DE RULE ENGINE ESTA MAL USADO, ver docu
+def create_rule(input1, input2, input3, input4, input5, output_string):
+    rule = Rule(
+        condition=lambda: input1 and input2 and input3 and input4 and input5,
+        action=lambda: output_string
+    )
+
+    return rule
+
+rules = [
+    create_rule(True, True, True, True, True, "Test"),
+    create_rule(False, False, False, False, False, "Test")
+] # aca tenemos que agregar todas las rules que creamos
 
 @app.get("/")
 async def home():
@@ -38,6 +54,9 @@ async def get_fix(request: Request):
             return JSONResponse(
                                 status_code=400,
                                 content={'error': f"Attribute '{attr}' should have a boolean value"})
+    for rule in rules:
+        result = rule.evaluate(request_body["input1"], request_body["input2"], request_body["input3"], request_body["input4"], request_body["input5"])
+        print(result)
 
 # Example usage
     return JSONResponse(
