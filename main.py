@@ -18,18 +18,15 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-# TODO LO DE RULE ENGINE ESTA MAL USADO, ver docu
-def create_rule(input1, input2, input3, input4, input5, output_string):
-    rule = Rule(
-        condition=lambda: input1 and input2 and input3 and input4 and input5,
-        action=lambda: output_string
-    )
-
+def create_rule(input_1, input_2, input_3, input_4, input_5):
+    # CUIDADO, lo que es texto tiene que tener el mismo nombre que los argumentos del body, sino tira una exception gigante
+    rule = Rule(f"input_1 == {str(input_1).lower()} and input_2 == {str(input_2).lower()} and input_3 == {str(input_3).lower()} and input_4 == {str(input_4).lower()} and input_5 == {str(input_5).lower()} ")
     return rule
 
+
 rules = [
-    create_rule(True, True, True, True, True, "Test"),
-    create_rule(False, False, False, False, False, "Test")
+    (create_rule(True, True, True, True, True), "Output 1"),
+    (create_rule(False, False, False, False, False), "Output 2")
 ] # aca tenemos que agregar todas las rules que creamos
 
 @app.get("/")
@@ -39,6 +36,7 @@ async def home():
         status_code=200,
         content={'hello': 'get'})
 
+# Para chequear que esten todos los args del body del post, hay que ponerle nombres decentes y hacer que queden iguales en create_rule
 body_args = ["input_1", "input_2", "input_3", "input_4", "input_5"]
 
 @app.post("/")
@@ -55,13 +53,16 @@ async def get_fix(request: Request):
                                 status_code=400,
                                 content={'error': f"Attribute '{attr}' should have a boolean value"})
     for rule in rules:
-        result = rule.evaluate(request_body["input1"], request_body["input2"], request_body["input3"], request_body["input4"], request_body["input5"])
-        print(result)
-
-# Example usage
+        rule_func = rule[0]
+        output = rule[1]
+        result = rule_func.matches(request_body)
+        if (result):
+            return JSONResponse(
+                                status_code=200,
+                                content={"fix": output})
     return JSONResponse(
         status_code=200,
-        content={'hello': 'post'})
+        content={"fix": "none"})
 
 
 if __name__ == '__main__':
