@@ -23,12 +23,12 @@ def create_rule(input_1, input_2, input_3, input_4, input_5):
     rule = Rule(f"input_1 == {str(input_1).lower()} and input_2 == {str(input_2).lower()} and input_3 == {str(input_3).lower()} and input_4 == {str(input_4).lower()} and input_5 == {str(input_5).lower()} ")
     return rule
 
-
+# aca tenemos que agregar todas las rules que creamos. La primera parte de la tupla, la funcion, crea la regla que se cumple si lo que 
+# nos pasan de front es igual que los args. La segunda de la tupla parte es lo que le devolvemos al cliente si se cumple esa regla, osea la E elegida
 rules = [
     (create_rule(True, True, True, True, True), "Output 1"),
     (create_rule(False, False, False, False, False), "Output 2")
-] # aca tenemos que agregar todas las rules que creamos
-
+]
 @app.get("/")
 async def home():
     print("GET request received at '/'")
@@ -62,7 +62,7 @@ async def get_fix(request: Request):
                                 content={"fix": output})
     return JSONResponse(
         status_code=200,
-        content={"fix": "none"})
+        content={"fix": "none"}) # Rta si no cumple ninguna regla
 
 
 if __name__ == '__main__':
