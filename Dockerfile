@@ -1,6 +1,10 @@
 # Use the official Python base image
 FROM python:3.9
 
+RUN pip3 install rule-engine
+RUN pip3 install fastapi
+RUN pip3 install uvicorn
+
 # Set the working directory in the container
 WORKDIR /app
 
