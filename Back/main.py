@@ -28,7 +28,10 @@ app.add_middleware(
 )
 
 def stringifyBools(boolsArray):
-    returnedString = str(boolsArray[0])
+    if (len(boolsArray) != 0):
+        returnedString = str(boolsArray[0])
+    else:
+        returnedString = ""
     for value in boolsArray[1:]:
         returnedString += f"-´{str(value)}"
     return returnedString
@@ -106,9 +109,12 @@ async def get_fix(answersBody: Answers):
     returnDict = None
     if (not processingResult["gotAnswer"]):
         questionId = processingResult["question"]
+        print("questionId")
+        print(questionId)
         if (questionId is None):
             returnDict = { "questionId": questionId, "questionText": None }
-        returnDict = { "questionId": questionId, "questionText": questionsTextsDict[questionId] }
+        else:
+            returnDict = { "questionId": questionId, "questionText": questionsTextsDict[questionId] }
     else:
         answerId = processingResult["answer"]
         print("answersDict")
