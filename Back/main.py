@@ -60,7 +60,7 @@ globalRulesdict = getRulesDict([
 
 questionsOrder = ["C1", "C2", "C3", "C4", "C5"]
 
-questionsDict = {
+questionsTextsDict = {
     "C1": "",
     "C2": "",
     "C3": "",
@@ -68,7 +68,7 @@ questionsDict = {
     "C5": "",
 }
 
-answersDict = {
+answersTextsDict = {
     "E1": "",
     "E2": "",
     "E3": "",
@@ -104,14 +104,16 @@ async def get_fix(answersBody: Answers):
     print(f"booleanValues: {booleanValues}")
     processingResult = processAnswers(booleanValues)
     returnDict = None
-    if (processingResult["gotAnswer"]):
+    if (not processingResult["gotAnswer"]):
         questionId = processingResult["question"]
         if (questionId is None):
             returnDict = { "questionId": questionId, "questionText": None }
-        returnDict = { "questionId": questionId, "questionText": questionsDict[questionId] }
+        returnDict = { "questionId": questionId, "questionText": questionsTextsDict[questionId] }
     else:
         answerId = processingResult["answer"]
-        returnDict = { "answerId": answerId, "answerText": answersDict[answerId] }
+        print("answersDict")
+        print(answersDict)
+        returnDict = { "answerId": answerId, "answerText": answersTextsDict[answerId] }
     return JSONResponse(
         status_code=200,
         content=returnDict) # Rta si no cumple ninguna regla
