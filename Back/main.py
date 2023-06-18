@@ -82,6 +82,8 @@ def processAnswers(boolsArray):
     answersAmount = len(boolsArray)
     answerKey = stringifyBools(boolsArray)
     if (not (answerKey in globalRulesdict)):
+        if (answersAmount == len(questionsOrder)):
+            return { "gotAnswer": False, "question": None }
         return { "gotAnswer": False, "question": questionsOrder[answersAmount] }
     return { "gotAnswer": True, "answer": globalRulesdict[answerKey] }
 
@@ -100,9 +102,19 @@ async def get_fix(answersBody: Answers):
     print(f"answersArray: {answersArray}")
     booleanValues = [answer ["answer"] for answer in answersArray]
     print(f"booleanValues: {booleanValues}")
+    processingResult = processAnswers(booleanValues)
+    returnDict = None
+    if (processingResult["gotAnswer"]):
+        questionId = processingResult["question"]
+        if (questionId is None):
+            returnDict = { "questionId": questionId, "questionText": None }
+        returnDict = { "questionId": questionId, "questionText": questionsDict[questionId] }
+    else:
+        answerId = processingResult["answer"]
+        returnDict = { "answerId": answerId, "answerText": answersDict[answerId] }
     return JSONResponse(
         status_code=200,
-        content={"fix": "none"}) # Rta si no cumple ninguna regla
+        content=returnDict) # Rta si no cumple ninguna regla
 
 
 if __name__ == '__main__':
