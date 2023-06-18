@@ -109,16 +109,12 @@ async def get_fix(answersBody: Answers):
     returnDict = None
     if (not processingResult["gotAnswer"]):
         questionId = processingResult["question"]
-        print("questionId")
-        print(questionId)
         if (questionId is None):
             returnDict = { "questionId": questionId, "questionText": None }
         else:
             returnDict = { "questionId": questionId, "questionText": questionsTextsDict[questionId] }
     else:
         answerId = processingResult["answer"]
-        print("answersDict")
-        print(answersDict)
         returnDict = { "answerId": answerId, "answerText": answersTextsDict[answerId] }
     return JSONResponse(
         status_code=200,
