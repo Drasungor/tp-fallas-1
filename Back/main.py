@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from typing import List
 
 class Answer(BaseModel):
-    id: str
+    questionId: str
     question: str
     answer: bool
 
@@ -34,11 +34,64 @@ def create_rule(input_1, input_2, input_3, input_4, input_5):
 
 # aca tenemos que agregar todas las rules que creamos. La primera parte de la tupla, la funcion, crea la regla que se cumple si lo que 
 # nos pasan de front es igual que los args. La segunda de la tupla parte es lo que le devolvemos al cliente si se cumple esa regla, osea la E elegida
-rules = [
-    (create_rule(True, True, True, True, True), "Output 1"),
-    (create_rule(False, False, False, False, False), "Output 2")
-]
 
+def stringifyBools(boolsArray):
+    returnedString = str(boolsArray[0])
+    for value in boolsArray[1:]:
+        returnedString += f"-´{str(value)}"
+    return returnedString
+
+def getRulesDict(rulesArray): # `[(result, bools)]`
+    rulesDict = {}
+    for rule in rulesArray:
+        result = rule[0]
+        bools = rule[1]
+        rulesDict[stringifyBools(bools)] = result
+    return rulesDict
+
+globalRulesdict = getRulesDict([
+    ("E7", [False, False, False]),
+    ("E3", [False, False, True]),
+    ("E6", [False, True, False]),
+    ("E1", [False, True, True, False, False]),
+    ("E1", [False, True, True, False, True]),
+    ("E2", [True, False, False, True, False]),
+    ("E2", [True, False, False, True, True]),
+    ("E4", [True, False, True, False]),
+    ("E4", [True, False, True, True, False]),
+    ("E5", [True, False, True, True, True]),
+    ("E1", [True, True, True, False, False]),
+    ("E1", [True, True, True, False, True]),
+    ("E4", [True, True, True, True, False]),
+    ("E5", [True, True, True, True, True])
+])
+
+questionsOrder = ["C1", "C2", "C3", "C4", "C5"]
+
+questionsDict = {
+    "C1": "",
+    "C2": "",
+    "C3": "",
+    "C4": "",
+    "C5": "",
+}
+
+answersDict = {
+    "E1": "",
+    "E2": "",
+    "E3": "",
+    "E4": "",
+    "E5": "",
+    "E6": "",
+    "E7": "",
+}
+
+def processAnswers(boolsArray):
+    answersAmount = len(boolsArray)
+    answerKey = stringifyBools(boolsArray)
+    if (not (answerKey in globalRulesdict)):
+        return { "gotAnswer": False, "question": questionsOrder[answersAmount] }
+    return { "gotAnswer": True, "answer": globalRulesdict[answerKey] }
 
 @app.get("/")
 async def home():
