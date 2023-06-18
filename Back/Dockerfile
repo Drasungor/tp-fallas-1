@@ -4,6 +4,8 @@ FROM python:3.9
 RUN pip3 install rule-engine
 RUN pip3 install fastapi
 RUN pip3 install uvicorn
+RUN pip3 install pydantic
+RUN pip3 install typing
 RUN pip3 install rule-engine
 
 # Set the working directory in the container

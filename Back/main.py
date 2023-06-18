@@ -1,12 +1,21 @@
 import os
 from rule_engine import Rule
-# import rule_engine
 import uvicorn
 
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List
+
+class Answer(BaseModel):
+    id: str
+    question: str
+    answer: bool
+
+class Answers(BaseModel):
+    answers: List[Answer]
 
 app = FastAPI()
 
@@ -29,6 +38,8 @@ rules = [
     (create_rule(True, True, True, True, True), "Output 1"),
     (create_rule(False, False, False, False, False), "Output 2")
 ]
+
+
 @app.get("/")
 async def home():
     print("GET request received at '/'")
@@ -40,26 +51,33 @@ async def home():
 body_args = ["input_1", "input_2", "input_3", "input_4", "input_5"]
 
 @app.post("/")
-async def get_fix(request: Request):
+# async def get_fix(request: Request):
+async def get_fix(answersBody: Answers):
     print("POST request received at '/'")
-    request_body = await request.json()
-    for attr in body_args:
-        if attr not in request_body:
-            return JSONResponse(
-                                status_code=400,
-                                content={'error': f"Attribute '{attr}' should be included in the request body"})
-        if not isinstance(request_body[attr], bool):
-            return JSONResponse(
-                                status_code=400,
-                                content={'error': f"Attribute '{attr}' should have a boolean value"})
-    for rule in rules:
-        rule_func = rule[0]
-        output = rule[1]
-        result = rule_func.matches(request_body)
-        if (result):
-            return JSONResponse(
-                                status_code=200,
-                                content={"fix": output})
+    # request_body = await request.json()
+    # print(request_body)
+    answersDict = answersBody.dict()
+    answersArray = answersDict["answers"]
+    print(f"answersArray: {answersArray}")
+    booleanValues = [answer ["answer"] for answer in answersArray]
+    print(f"booleanValues: {booleanValues}")
+    # for attr in body_args:
+    #     if attr not in request_body:
+    #         return JSONResponse(
+    #                             status_code=400,
+    #                             content={'error': f"Attribute '{attr}' should be included in the request body"})
+    #     if not isinstance(request_body[attr], bool):
+    #         return JSONResponse(
+    #                             status_code=400,
+    #                             content={'error': f"Attribute '{attr}' should have a boolean value"})
+    # for rule in rules:
+    #     rule_func = rule[0]
+    #     output = rule[1]
+    #     result = rule_func.matches(request_body)
+    #     if (result):
+    #         return JSONResponse(
+    #                             status_code=200,
+    #                             content={"fix": output})
     return JSONResponse(
         status_code=200,
         content={"fix": "none"}) # Rta si no cumple ninguna regla
