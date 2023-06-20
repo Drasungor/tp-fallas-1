@@ -152,11 +152,8 @@ function App() {
           // paso a la siguiente pregunta
           nextQuestion();
         }
-
       })
-
     }
-
   }
 
   const handleBack = () => {
@@ -174,21 +171,26 @@ function App() {
     setValue(null)
   }
 
+  const styles = {
+    box: { opacity: 0.7, zIndex: 0, background: 'url(/images/fondo.jpg) center top / cover transparent'},
+    typography: {
+      fontSize: '3rem',
+      fontWeight: 700,
+      color: '#FFFFFF'
+    }
+  };
+
   return (
     <Grid container>
       <Box component={Grid}
            item xs={12}
            height={500}
-           sx={{opacity: 0.7, zIndex: 0, background: 'url(/images/fondo.jpg) center top / cover transparent'}}
+           sx={styles.box}
       />
       <Grid item xs={12} container pr={2} pl={2} justifyContent={'center'} mt={-50} zIndex={1}>
         <Typography
           mb={5}
-          sx={{
-            fontSize: '3rem',
-            fontWeight: 700,
-            color: '#FFFFFF'
-          }}
+          sx={styles.typography}
         >Prevención Influenza Aviar</Typography>
 
         <Card sx={{width: '90%', minHeight: 500}}>
@@ -200,7 +202,7 @@ function App() {
           {answers.length > 1 && answerId === "" &&
             <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange}/>}
           {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
-                                          subheader={ANSWERS.get(answerId)}
+                                          subheader={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
           />
           }
 
