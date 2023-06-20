@@ -11,7 +11,7 @@ from typing import List
 
 class Answer(BaseModel):
     questionId: str
-    question: str
+    questionText: str
     answer: bool
 
 class Answers(BaseModel):
