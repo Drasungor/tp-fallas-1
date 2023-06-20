@@ -118,7 +118,7 @@ async def get_fix(answersBody: Answers):
         returnDict = { "answerId": answerId, "answerText": answersTextsDict[answerId] }
     return JSONResponse(
         status_code=200,
-        content=returnDict) # Rta si no cumple ninguna regla
+        content=returnDict)
 
 
 if __name__ == '__main__':
