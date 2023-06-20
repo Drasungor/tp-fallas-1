@@ -16,48 +16,39 @@ import {
   RadioGroup,
   Typography
 } from "@mui/material";
+import {IAnswer, postAnswer} from "./services/apicalls";
 
 type Props = {
-  step: IStep
+  answer: IAnswer,
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  value: Level
 }
 
-interface IStep {
-  id: string
-  textoPregunta: string,
-  respuesta: string
-}
-
-function StepForm({step}: Props) {
-  const [value, setValue] = useState("medio")
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value)
-  }
-
+function QuestionForm({answer, handleChange, value}: Props) {
+  // TODO: ver si con answer puedo setear el valor del radio button
+  // de manera de que al volver para atras quede la ultima seleccion
   return (
     <Fragment>
       <Container component="main" maxWidth="sm" sx={{mb: 4}}>
         <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
           <Typography component="h1" variant="h4" align="center">
-            Determinar tipo de Medida de Prevención - Paso {step.id}
+            Determinar tipo de Medida de Prevención - Paso {answer.questionId}
           </Typography>
           <Fragment>
             <Typography variant="h6" gutterBottom>
-              {step.textoPregunta}
+              {answer.questionText}
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <FormControl>
-                  <FormLabel id="demo-radio-buttons-group-label">Nivel</FormLabel>
+                  <FormLabel id="demo-radio-buttons-group-label">Nivel seleccionado {value}</FormLabel>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
                     name="controlled-radio-buttons-group"
-                    value={value}
                     onChange={handleChange}
                   >
-                    <FormControlLabel value="alto" control={<Radio/>} label="Alto"/>
-                    <FormControlLabel value="medio" control={<Radio/>} label="Medio"/>
-                    <FormControlLabel value="bajo" control={<Radio/>} label="Bajo"/>
+                    <FormControlLabel value="ALTO" control={<Radio/>} label="Alto"/>
+                    <FormControlLabel value="BAJO" control={<Radio/>} label="Bajo"/>
                   </RadioGroup>
                 </FormControl>
 
@@ -71,27 +62,86 @@ function StepForm({step}: Props) {
   )
 }
 
-const initSteps: IStep[] = [{id: "0", textoPregunta: "Empezar", respuesta: ""}, {
-  id: "1",
-  textoPregunta: "Ingresar tipo presupuesto",
-  respuesta: ""
-}]
+enum Level {
+  BAJO,
+  ALTO
+}
+
+type LevelStrings = keyof typeof Level;
+
+const QUESTIONS : IAnswer[] = [
+  {
+    questionId: "0",
+    questionText: "Empezar",
+    answer: null
+  },
+  {
+    questionId: "C1",
+    questionText: "Ingresar tipo presupuesto",
+    answer: null
+  }, {
+    questionId: "C2",
+    questionText: "Ingresar nivel de exposición gallinas con aves silvestres",
+    answer: null
+  }, {
+    questionId: "C3",
+    questionText: "Ingresar nivel de exposición gallinas con humanos",
+    answer: null
+  } ,
+  {
+    questionId: "C4",
+    questionText: "Ingresar nivel población gallinas",
+    answer: null
+  },
+  {
+    questionId: "C5",
+    questionText: "Ingresar nivel población personal",
+    answer: null
+  }
+
+]
+
+const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
 
 function App() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [steps, setSteps] = useState<IStep[]>(initSteps)
+  const [answers, setAnswers] = useState<IAnswer[]>(INIT_QUESTIONS)
+  // TODO: reemplazar value por una variable pq no se renderiza su valor
+  // alternativa: manejarlo a partir del answer (si es null nada, si es true ALTO, si es false BAJO)
+  const [value, setValue] = useState<Level>(Level.BAJO)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = (event.target as HTMLInputElement).value
+    const level = Level[input as LevelStrings]
+    setValue(level)
+  }
 
   const handleNext = () => {
-    setActiveStep(oldActiveStep => ((oldActiveStep + 1) < steps.length) ? (oldActiveStep + 1) : oldActiveStep)
+    if (answers.length > 1) {
+      // envio la respuesta
+      const isYes = (value === Level.ALTO)
+      const newAnswer = {...answers[answers.length - 1], answer: isYes}
+      setAnswers(oldAnswers => {oldAnswers[answers.length - 1] = newAnswer; return oldAnswers})
+      console.log("POSTING ANSWER", answers[answers.length - 1])
+      // postAnswer(answers)
+
+    }
+    // paso a la siguiente pregunta
+    setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+    console.log(answers)
   }
 
   const handleBack = () => {
-    setActiveStep(oldActiveStep => ((oldActiveStep - 1) >= 0) ? (oldActiveStep - 1) : oldActiveStep)
+    setAnswers(oldAnswers => {
+      const newAnswers = [...oldAnswers]
+      newAnswers.pop()
+      return newAnswers
+    })
+    console.log(answers)
   }
 
   const handleReset = () => {
-    setSteps(initSteps)
-    setActiveStep(0)
+    setAnswers(INIT_QUESTIONS)
+    console.log(answers)
   }
 
   return (
@@ -112,19 +162,20 @@ function App() {
         >Prevención Influenza Aviar</Typography>
 
         <Card sx={{width: '90%', minHeight: 500}}>
-          {activeStep === 0 ? (
+          {answers.length === 1 ? (
             <CardHeader title={"Medida de prevención de influenza aviar"}
                         subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
                           "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
             />) : (
-            <StepForm step={steps[activeStep]}/>
+            <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>
           )}
 
           <CardContent>
             <Box sx={{display: 'flex', justifyContent: "center"}}>
-              <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>
-              <Button variant={'contained'} onClick={handleNext}> {activeStep === 0 ? "Empezar" : "Siguiente"} </Button>
-              <Button variant={'contained'} onClick={handleReset}> {"Reiniciar"} </Button>
+              {answers.length > 1 && <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>}
+              {answers.length < QUESTIONS.length && <Button variant={'contained'}
+                       onClick={handleNext}> {answers.length === 1 ? "Empezar" : "Siguiente"} </Button>}
+              {answers.length > 1 &&  <Button variant={'contained'} onClick={handleReset}> {"Reiniciar"} </Button>}
             </Box>
           </CardContent>
         </Card>
