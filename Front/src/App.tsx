@@ -15,48 +15,71 @@ import {
   RadioGroup,
   Typography,
   styled,
+  CardActions,
+  CardMedia
 } from "@mui/material";
 import {IAnswer, postAnswer} from "./services/apicalls";
+import StartCard from './components/StartCard';
+import SolutionCard from './components/SolutionCard';
 
 type Props = {
   answer: IAnswer,
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  handleBack: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  handleNext: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  handleReset: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  disableNext: boolean
 }
 
-function QuestionForm({answer, handleChange}: Props) {
+function QuestionForm({answer, handleChange, handleBack, handleNext, handleReset, disableNext}: Props) {
   // TODO: ver si con answer puedo setear el valor del radio button
   // de manera de que al volver para atras quede la ultima seleccion
   return (
-    <Fragment>
-      <Container component="main" maxWidth="sm" sx={{mb: 4}}>
-        <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
-          <Typography component="h1" variant="h4" align="center">
-            Determinar tipo de Medida de Prevención - Paso {answer.questionId}
-          </Typography>
-          <Fragment>
-            <Typography variant="h6" gutterBottom>
-              {answer.questionText}
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <FormControl>
-                  <RadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    name="controlled-radio-buttons-group"
-                    onChange={handleChange}
-                  >
-                    <FormControlLabel value="ALTO" control={<Radio/>} label="Si"/>
-                    <FormControlLabel value="BAJO" control={<Radio/>} label="No"/>
-                  </RadioGroup>
-                </FormControl>
-
-              </Grid>
-            </Grid>
-          </Fragment>
-        </Paper>
-      </Container>
-    </Fragment>
-
+    <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
+      <CardHeader 
+        title={`Determinar tipo de Medida de Prevención \n Paso ${answer.questionId}`}
+        titleTypographyProps={{ align: 'center' }}
+      />
+      <CardMedia
+          component="img"
+          alt="aves"
+          height="200"
+          image="https://www.ospat.com.ar/wp-content/uploads/2023/04/pollo-blanco-granja.jpg"
+          style={{ objectFit: 'cover', objectPosition: 'top' }}
+        />
+      <CardContent>
+        <Fragment>
+          <Container component="main" maxWidth="sm" sx={{mb: 4}}>
+            <Paper sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
+              <Fragment>
+                <Typography variant="h6" gutterBottom style={{ textAlign: 'center' }}>
+                  {answer.questionText}
+                </Typography>
+                <Grid container>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl>
+                      <RadioGroup
+                        aria-labelledby="demo-radio-buttons-group-label"
+                        name="controlled-radio-buttons-group"
+                        onChange={handleChange}
+                      >
+                        <FormControlLabel value="ALTO" control={<Radio/>} label="Si"/>
+                        <FormControlLabel value="BAJO" control={<Radio/>} label="No"/>
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Fragment>
+            </Paper>
+          </Container>
+        </Fragment>
+      </CardContent>
+      <CardActions style={{ justifyContent: 'center' }}>
+        <Button color="error" onClick={handleReset}> Reiniciar </Button>
+        <Button onClick={handleBack}> Atras </Button>
+        <Button disabled={disableNext} onClick={handleNext}> Siguiente </Button>
+      </CardActions>
+    </Card>
   )
 }
 
@@ -172,15 +195,6 @@ function App() {
     setValue(null)
   }
 
-  const styles = {
-    box: { opacity: 0.7, zIndex: 0, background: 'url(/images/fondo.jpg) center top / cover transparent'},
-    typography: {
-      fontSize: '3rem',
-      fontWeight: 700,
-      color: '#FFFFFF'
-    }
-  };
-
   return (
     <Box 
       sx={{
@@ -209,24 +223,23 @@ function App() {
           <Grid item>
             <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
               {answers.length === 1 &&
-                <CardHeader title={"Medida de prevención de influenza aviar"}
-                            subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
-                              "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
-                />}
+                <StartCard handleStart={handleStart}/> }
               {answers.length > 1 && answerId === "" &&
-                <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange}/>}
-              {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
-                                              subheader={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
-              />
+                <QuestionForm 
+                  answer={answers[answers.length - 1]} 
+                  handleChange={handleChange}
+                  handleBack={handleBack}
+                  handleNext={handleNext}
+                  handleReset={handleReset}
+                  disableNext={value === null}
+                />
               }
-              <CardContent>
-                <Box sx={{display: 'flex', justifyContent: "center"}}>
-                  {answers.length > 1 && <Button onClick={handleBack}> {"Atras"} </Button>}
-                  {answers.length === 1 && <Button onClick={handleStart}> Empezar </Button>}
-                  {answerId === "" && answers.length > 1 && <Button disabled={value === null} onClick={handleNext}> Siguiente </Button>}
-                  {answers.length > 1 && <Button onClick={handleReset}> Reiniciar </Button>}
-                </Box>
-              </CardContent>
+              {answerId !== "" && 
+                <SolutionCard 
+                  handleReset={handleReset} 
+                  answer={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"} 
+                /> 
+              }
             </Card>
           </Grid>
         </Grid>
