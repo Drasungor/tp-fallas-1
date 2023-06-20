@@ -1,4 +1,4 @@
-import React, {Fragment, useRef, useState} from 'react';
+import React, {Fragment, useState} from 'react';
 import './App.css';
 import {
   Box,
@@ -13,7 +13,8 @@ import {
   Paper,
   Radio,
   RadioGroup,
-  Typography
+  Typography,
+  styled,
 } from "@mui/material";
 import {IAnswer, postAnswer} from "./services/apicalls";
 
@@ -181,43 +182,64 @@ function App() {
   };
 
   return (
-    <Grid container>
-      <Box component={Grid}
-           item xs={12}
-           height={500}
-           sx={styles.box}
-      />
-      <Grid item xs={12} container pr={2} pl={2} justifyContent={'center'} mt={-50} zIndex={1}>
-        <Typography
-          mb={5}
-          sx={styles.typography}
-        >Prevención Influenza Aviar</Typography>
-
-        <Card sx={{width: '90%', minHeight: 500}}>
-          {answers.length === 1 &&
-            <CardHeader title={"Medida de prevención de influenza aviar"}
-                        subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
-                          "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
-            />}
-          {answers.length > 1 && answerId === "" &&
-            <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange}/>}
-          {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
-                                          subheader={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
-          />
-          }
-
-          <CardContent>
-            <Box sx={{display: 'flex', justifyContent: "center"}}>
-              {answers.length > 1 && <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>}
-              {answers.length === 1 && <Button variant={'contained'} onClick={handleStart}> Empezar </Button>}
-              {answerId === "" && answers.length > 1 && <Button variant={'contained'} disabled={value === null} onClick={handleNext}> Siguiente </Button>}
-              {answers.length > 1 && <Button variant={'contained'} onClick={handleReset}> Reiniciar </Button>}
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
+    <Box 
+      sx={{
+        background: 'url(/images/fondo.jpg) center top / cover transparent',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        width: '100vw',
+        minHeight: '100vh'
+      }}
+    >
+      <CenteredContainer>
+        <Grid container direction="column" alignItems="center">
+          <Grid item>
+            <Typography
+              variant="h4"
+              mb={5}
+              sx={{
+                fontWeight: 700,
+                color: '#FFFFFF',
+              }}
+            >
+              Prevención Influenza Aviar
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
+              {answers.length === 1 &&
+                <CardHeader title={"Medida de prevención de influenza aviar"}
+                            subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
+                              "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
+                />}
+              {answers.length > 1 && answerId === "" &&
+                <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange}/>}
+              {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
+                                              subheader={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
+              />
+              }
+              <CardContent>
+                <Box sx={{display: 'flex', justifyContent: "center"}}>
+                  {answers.length > 1 && <Button onClick={handleBack}> {"Atras"} </Button>}
+                  {answers.length === 1 && <Button onClick={handleStart}> Empezar </Button>}
+                  {answerId === "" && answers.length > 1 && <Button disabled={value === null} onClick={handleNext}> Siguiente </Button>}
+                  {answers.length > 1 && <Button onClick={handleReset}> Reiniciar </Button>}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </CenteredContainer>
+    </Box>
   )
 }
+
+const CenteredContainer = styled(Container)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
 
 export default App;
