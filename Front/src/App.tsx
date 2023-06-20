@@ -41,14 +41,13 @@ function QuestionForm({answer, handleChange, value}: Props) {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <FormControl>
-                  <FormLabel id="demo-radio-buttons-group-label">Nivel seleccionado {value}</FormLabel>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
                     name="controlled-radio-buttons-group"
                     onChange={handleChange}
                   >
-                    <FormControlLabel value="ALTO" control={<Radio/>} label="Alto"/>
-                    <FormControlLabel value="BAJO" control={<Radio/>} label="Bajo"/>
+                    <FormControlLabel value="ALTO" control={<Radio/>} label="Si"/>
+                    <FormControlLabel value="BAJO" control={<Radio/>} label="No"/>
                   </RadioGroup>
                 </FormControl>
 
@@ -77,38 +76,38 @@ const QUESTIONS : IAnswer[] = [
   },
   {
     questionId: "C1",
-    questionText: "Ingresar tipo presupuesto",
+    questionText: "¿Requiere que la medida sea viable con bajo presupuesto?",
     answer: null
   }, {
     questionId: "C2",
-    questionText: "Ingresar nivel de exposición gallinas con aves silvestres",
+    questionText: "¿Sus aves tienen una alta exposición ante aves silvestres?",
     answer: null
   }, {
     questionId: "C3",
-    questionText: "Ingresar nivel de exposición gallinas con humanos",
+    questionText: "¿Sus aves tienen un alto grado de interacción con humanos?",
     answer: null
   } ,
   {
     questionId: "C4",
-    questionText: "Ingresar nivel población gallinas",
+    questionText: "¿Tiene una gran cantidad de aves (por ej. mas de 100)?",
     answer: null
   },
   {
     questionId: "C5",
-    questionText: "Ingresar nivel población personal",
+    questionText: "¿Tiene una gran cantidad de personal (por ej. mas de 10)?",
     answer: null
   }
 
 ]
 
 const ANSWERS = new Map<string, string>()
-ANSWERS.set("E1", "e1")
-ANSWERS.set("E2", "e2")
-ANSWERS.set("E3", "e3")
-ANSWERS.set("E4", "e4")
-ANSWERS.set("E5", "e5")
-ANSWERS.set("E6", "e6")
-ANSWERS.set("E7", "e7")
+ANSWERS.set("E1", "Confinamiento avícola")
+ANSWERS.set("E2", "Evitar visitar otras granjas")
+ANSWERS.set("E3", "Indumentaria de bioseguridad")
+ANSWERS.set("E4", "Disponer alimentos en lugares solo accesibles por las aves")
+ANSWERS.set("E5", "Elementos de disipación de aves silvestres")
+ANSWERS.set("E6", "Higiene intensificada")
+ANSWERS.set("E7", "Monitoreo diario del estado de salud avícola")
 
 
 const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
@@ -193,8 +192,8 @@ function App() {
                         subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
                           "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
             />}
-          {answers.length > 1 && answerId == "" &&<QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>}
-          {answerId != "" && <CardHeader title={"Medida de prevención a utilizar"}
+          {answers.length > 1 && answerId === "" &&<QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>}
+          {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
                                     subheader={ANSWERS.get(answerId)}
           />
           }
@@ -202,7 +201,7 @@ function App() {
           <CardContent>
             <Box sx={{display: 'flex', justifyContent: "center"}}>
               {answers.length > 1 && <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>}
-              {answerId == "" && <Button variant={'contained'}
+              {answerId === "" && <Button variant={'contained'}
                        onClick={handleNext}> {answers.length === 1 ? "Empezar" : "Siguiente"} </Button>}
               {answers.length > 1 &&  <Button variant={'contained'} onClick={handleReset}> {"Reiniciar"} </Button>}
             </Box>
