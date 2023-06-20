@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useRef, useState} from 'react';
 import './App.css';
 import {
   Box,
@@ -9,7 +9,6 @@ import {
   Container,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   Paper,
   Radio,
@@ -21,10 +20,9 @@ import {IAnswer, postAnswer} from "./services/apicalls";
 type Props = {
   answer: IAnswer,
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  value: Level
 }
 
-function QuestionForm({answer, handleChange, value}: Props) {
+function QuestionForm({answer, handleChange}: Props) {
   // TODO: ver si con answer puedo setear el valor del radio button
   // de manera de que al volver para atras quede la ultima seleccion
   return (
@@ -68,7 +66,7 @@ enum Level {
 
 type LevelStrings = keyof typeof Level;
 
-const QUESTIONS : IAnswer[] = [
+const QUESTIONS: IAnswer[] = [
   {
     questionId: "0",
     questionText: "Empezar",
@@ -86,7 +84,7 @@ const QUESTIONS : IAnswer[] = [
     questionId: "C3",
     questionText: "¿Sus aves tienen un alto grado de interacción con humanos?",
     answer: null
-  } ,
+  },
   {
     questionId: "C4",
     questionText: "¿Tiene una gran cantidad de aves (por ej. mas de 100)?",
@@ -101,22 +99,19 @@ const QUESTIONS : IAnswer[] = [
 ]
 
 const ANSWERS = new Map<string, string>()
-ANSWERS.set("E1", "Confinamiento avícola")
-ANSWERS.set("E2", "Evitar visitar otras granjas")
-ANSWERS.set("E3", "Indumentaria de bioseguridad")
-ANSWERS.set("E4", "Disponer alimentos en lugares solo accesibles por las aves")
-ANSWERS.set("E5", "Elementos de disipación de aves silvestres")
-ANSWERS.set("E6", "Higiene intensificada")
-ANSWERS.set("E7", "Monitoreo diario del estado de salud avícola")
-
+ANSWERS.set("E1", "E1 - Confinamiento avícola")
+ANSWERS.set("E2", "E2 - Evitar visitar otras granjas")
+ANSWERS.set("E3", "E3 - Indumentaria de bioseguridad")
+ANSWERS.set("E4", "E4 - Disponer alimentos en lugares solo accesibles por las aves")
+ANSWERS.set("E5", "E5 - Elementos de disipación de aves silvestres")
+ANSWERS.set("E6", "E6 - Higiene intensificada")
+ANSWERS.set("E7", "E7 - Monitoreo diario del estado de salud avícola")
 
 const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
 
 function App() {
   const [answers, setAnswers] = useState<IAnswer[]>(INIT_QUESTIONS)
-  // TODO: reemplazar value por una variable pq no se renderiza su valor
-  // alternativa: manejarlo a partir del answer (si es null nada, si es true ALTO, si es false BAJO)
-  const [value, setValue] = useState<Level>(Level.BAJO)
+  const [value, setValue] = useState<Level | null>(null)
   const [answerId, setAnswerId] = useState<string>("")
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,28 +120,37 @@ function App() {
     setValue(level)
   }
 
+  function nextQuestion() {
+    setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+  }
+
+  const handleStart = () => {
+    nextQuestion();
+  }
+
   const handleNext = () => {
-    if(answers.length === 1) {
-      setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+    if (answers.length === 1) {
       return
     }
     if (answers.length > 1) {
       // envio la respuesta
       const isYes = (value === Level.ALTO)
       const newAnswer = {...answers[answers.length - 1], answer: isYes}
-      setAnswers(oldAnswers => {oldAnswers[answers.length - 1] = newAnswer; return oldAnswers})
+      setAnswers(oldAnswers => {
+        oldAnswers[answers.length - 1] = newAnswer;
+        return oldAnswers
+      })
       postAnswer(answers).then(response => {
         if (response.data === null) {
           return response.statusCode
         }
         if ("answerId" in response) {
-          console.log("answerId", response.answerId)
+          // tengo la respuesta
           setAnswerId(response.answerId)
-          setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+          nextQuestion();
         } else if ("questionId" in response) {
-          console.log("questionId", response.questionId)
           // paso a la siguiente pregunta
-          setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+          nextQuestion();
         }
 
       })
@@ -167,6 +171,7 @@ function App() {
   const handleReset = () => {
     setAnswers(INIT_QUESTIONS)
     setAnswerId("")
+    setValue(null)
   }
 
   return (
@@ -192,18 +197,19 @@ function App() {
                         subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
                           "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
             />}
-          {answers.length > 1 && answerId === "" &&<QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>}
+          {answers.length > 1 && answerId === "" &&
+            <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange}/>}
           {answerId !== "" && <CardHeader title={"Medida de prevención a utilizar"}
-                                    subheader={ANSWERS.get(answerId)}
+                                          subheader={ANSWERS.get(answerId)}
           />
           }
 
           <CardContent>
             <Box sx={{display: 'flex', justifyContent: "center"}}>
               {answers.length > 1 && <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>}
-              {answerId === "" && <Button variant={'contained'}
-                       onClick={handleNext}> {answers.length === 1 ? "Empezar" : "Siguiente"} </Button>}
-              {answers.length > 1 &&  <Button variant={'contained'} onClick={handleReset}> {"Reiniciar"} </Button>}
+              {answers.length === 1 && <Button variant={'contained'} onClick={handleStart}> Empezar </Button>}
+              {answerId === "" && answers.length > 1 && <Button variant={'contained'} disabled={value === null} onClick={handleNext}> Siguiente </Button>}
+              {answers.length > 1 && <Button variant={'contained'} onClick={handleReset}> Reiniciar </Button>}
             </Box>
           </CardContent>
         </Card>

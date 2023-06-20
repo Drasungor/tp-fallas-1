@@ -11,9 +11,7 @@ export const postAnswer = async (answers: IAnswer[]) => {
     const requestData = {
       answers: answers.slice(1, answers.length)
     }
-    console.log("requestData", requestData)
     const {data: nextQuestion} = await client.post(`/`, requestData);
-    console.log("respuesta back", nextQuestion)
     return nextQuestion
 
   } catch (error: any) {
@@ -21,6 +19,6 @@ export const postAnswer = async (answers: IAnswer[]) => {
       "Request failed, response:",
       error
     );
-    return {data: null, statusCode: error.statusCode}
+    return {statusCode: error.statusCode}
   }
 }
