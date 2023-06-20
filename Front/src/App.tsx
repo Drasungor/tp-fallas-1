@@ -101,6 +101,16 @@ const QUESTIONS : IAnswer[] = [
 
 ]
 
+const ANSWERS = new Map<string, string>()
+ANSWERS.set("E1", "e1")
+ANSWERS.set("E2", "e2")
+ANSWERS.set("E3", "e3")
+ANSWERS.set("E4", "e4")
+ANSWERS.set("E5", "e5")
+ANSWERS.set("E6", "e6")
+ANSWERS.set("E7", "e7")
+
+
 const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
 
 function App() {
@@ -108,6 +118,7 @@ function App() {
   // TODO: reemplazar value por una variable pq no se renderiza su valor
   // alternativa: manejarlo a partir del answer (si es null nada, si es true ALTO, si es false BAJO)
   const [value, setValue] = useState<Level>(Level.BAJO)
+  const [answerId, setAnswerId] = useState<string>("")
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = (event.target as HTMLInputElement).value
@@ -116,18 +127,33 @@ function App() {
   }
 
   const handleNext = () => {
+    if(answers.length === 1) {
+      setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+      return
+    }
     if (answers.length > 1) {
       // envio la respuesta
       const isYes = (value === Level.ALTO)
       const newAnswer = {...answers[answers.length - 1], answer: isYes}
       setAnswers(oldAnswers => {oldAnswers[answers.length - 1] = newAnswer; return oldAnswers})
-      console.log("POSTING ANSWER", answers[answers.length - 1])
-      // postAnswer(answers)
+      postAnswer(answers).then(response => {
+        if (response.data === null) {
+          return response.statusCode
+        }
+        if ("answerId" in response) {
+          console.log("answerId", response.answerId)
+          setAnswerId(response.answerId)
+          setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+        } else if ("questionId" in response) {
+          console.log("questionId", response.questionId)
+          // paso a la siguiente pregunta
+          setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
+        }
+
+      })
 
     }
-    // paso a la siguiente pregunta
-    setAnswers(oldAnswers => [...oldAnswers, QUESTIONS[answers.length]])
-    console.log(answers)
+
   }
 
   const handleBack = () => {
@@ -136,12 +162,12 @@ function App() {
       newAnswers.pop()
       return newAnswers
     })
-    console.log(answers)
+    setAnswerId("")
   }
 
   const handleReset = () => {
     setAnswers(INIT_QUESTIONS)
-    console.log(answers)
+    setAnswerId("")
   }
 
   return (
@@ -162,18 +188,21 @@ function App() {
         >Prevención Influenza Aviar</Typography>
 
         <Card sx={{width: '90%', minHeight: 500}}>
-          {answers.length === 1 ? (
+          {answers.length === 1 &&
             <CardHeader title={"Medida de prevención de influenza aviar"}
                         subheader={"A continuación deberá completar una seríe de preguntas respecto a las características de su negocio " +
                           "y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted"}
-            />) : (
-            <QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>
-          )}
+            />}
+          {answers.length > 1 && answerId == "" &&<QuestionForm answer={answers[answers.length - 1]} handleChange={handleChange} value={value}/>}
+          {answerId != "" && <CardHeader title={"Medida de prevención a utilizar"}
+                                    subheader={ANSWERS.get(answerId)}
+          />
+          }
 
           <CardContent>
             <Box sx={{display: 'flex', justifyContent: "center"}}>
               {answers.length > 1 && <Button variant={'contained'} onClick={handleBack}> {"Atras"} </Button>}
-              {answers.length < QUESTIONS.length && <Button variant={'contained'}
+              {answerId == "" && <Button variant={'contained'}
                        onClick={handleNext}> {answers.length === 1 ? "Empezar" : "Siguiente"} </Button>}
               {answers.length > 1 &&  <Button variant={'contained'} onClick={handleReset}> {"Reiniciar"} </Button>}
             </Box>

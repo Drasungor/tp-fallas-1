@@ -2,7 +2,7 @@ import axios from "axios";
 
 const profiles = {
   production: "",
-  development: "http://localhost:2000"
+  development: "http://localhost:8000"
 };
 
 // @ts-ignore
