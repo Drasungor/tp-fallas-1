@@ -72,6 +72,15 @@ ANSWERS.set("E7", "E7 - Monitoreo diario del estado de salud avícola")
 
 const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
 
+const IMAGENES = [
+  '',
+  '/images/pollo-blanco-granja.jpg',
+  '/images/migracion.jpg',
+  '/images/humanos.jpg',
+  '/images/poblacion_gallinas.jpg',
+  '/images/personas.jpg',
+]
+
 function App() {
   const [answers, setAnswers] = useState<IAnswer[]>(INIT_QUESTIONS)
   const [value, setValue] = useState<Level | null>(null)
@@ -165,7 +174,7 @@ function App() {
                   handleNext={handleNext}
                   handleReset={handleReset}
                   disableNext={value === null}
-                  imageUrl={"https://www.ospat.com.ar/wp-content/uploads/2023/04/pollo-blanco-granja.jpg"}
+                  imageUrl={IMAGENES[answers.length - 1]}
                 />
               }
               {answerId !== "" &&
