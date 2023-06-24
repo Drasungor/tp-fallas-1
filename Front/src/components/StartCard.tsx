@@ -34,7 +34,7 @@ function StartCard ({handleStart}: Props) {
         y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted.
       </CardContent>
       <CardActions style={{ justifyContent: 'center' }}>
-        <Button size="large" variant="outlined" endIcon={<PlayArrowIcon />} onClick={handleStart}> Empezar </Button>
+        <Button size="large" variant="outlined" endIcon={<PlayArrowIcon/>} onClick={handleStart}> Empezar </Button>
       </CardActions>
     </Card>
   );

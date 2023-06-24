@@ -1,12 +1,12 @@
 import client from "./config";
 
-export interface IAnswer {
+export interface IQuestion {
   questionId: string
   questionText: string,
   answer: boolean | null
 }
 // USER
-export const postAnswer = async (answers: IAnswer[]) => {
+export const postAnswer = async (answers: IQuestion[]) => {
   try {
     const requestData = {
       answers: answers.slice(1, answers.length)

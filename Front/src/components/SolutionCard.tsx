@@ -31,7 +31,7 @@ function SolutionCard ({handleReset, answer}: Props) {
         {answer}
       </CardContent>
       <CardActions style={{ justifyContent: 'center' }}>
-        <Button size="large" variant="outlined" endIcon={<RestartAlt />} onClick={handleReset}> Reiniciar </Button>
+        <Button size="large" variant="outlined" endIcon={<RestartAlt/>} onClick={handleReset}> Reiniciar </Button>
       </CardActions>
     </Card>
   );
