@@ -14,74 +14,13 @@ import {
   Radio,
   RadioGroup,
   Typography,
-  styled,
   CardActions,
-  CardMedia
+  CardMedia, Stepper, Step, StepLabel
 } from "@mui/material";
 import {IAnswer, postAnswer} from "./services/apicalls";
 import StartCard from './components/StartCard';
 import SolutionCard from './components/SolutionCard';
-
-type Props = {
-  answer: IAnswer,
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  handleBack: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  handleNext: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  handleReset: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-  disableNext: boolean
-}
-
-function QuestionForm({answer, handleChange, handleBack, handleNext, handleReset, disableNext}: Props) {
-  // TODO: ver si con answer puedo setear el valor del radio button
-  // de manera de que al volver para atras quede la ultima seleccion
-  return (
-    <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
-      <CardHeader 
-        title={`Determinar tipo de Medida de Prevención \n Paso ${answer.questionId}`}
-        titleTypographyProps={{ align: 'center' }}
-      />
-      <CardMedia
-          component="img"
-          alt="aves"
-          height="200"
-          image="https://www.ospat.com.ar/wp-content/uploads/2023/04/pollo-blanco-granja.jpg"
-          style={{ objectFit: 'cover', objectPosition: 'top' }}
-        />
-      <CardContent>
-        <Fragment>
-          <Container component="main" maxWidth="sm" sx={{mb: 4}}>
-            <Paper sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
-              <Fragment>
-                <Typography variant="h6" gutterBottom style={{ textAlign: 'center' }}>
-                  {answer.questionText}
-                </Typography>
-                <Grid container>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl>
-                      <RadioGroup
-                        aria-labelledby="demo-radio-buttons-group-label"
-                        name="controlled-radio-buttons-group"
-                        onChange={handleChange}
-                      >
-                        <FormControlLabel value="ALTO" control={<Radio/>} label="Si"/>
-                        <FormControlLabel value="BAJO" control={<Radio/>} label="No"/>
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Fragment>
-            </Paper>
-          </Container>
-        </Fragment>
-      </CardContent>
-      <CardActions style={{ justifyContent: 'center' }}>
-        <Button color="error" onClick={handleReset}> Reiniciar </Button>
-        <Button onClick={handleBack}> Atras </Button>
-        <Button disabled={disableNext} onClick={handleNext}> Siguiente </Button>
-      </CardActions>
-    </Card>
-  )
-}
+import QuestionForm from "./components/QuestionForm";
 
 enum Level {
   BAJO,
@@ -128,7 +67,7 @@ ANSWERS.set("E2", "E2 - Evitar visitar otras granjas")
 ANSWERS.set("E3", "E3 - Indumentaria de bioseguridad")
 ANSWERS.set("E4", "E4 - Disponer alimentos en lugares solo accesibles por las aves")
 ANSWERS.set("E5", "E5 - Elementos de disipación de aves silvestres")
-ANSWERS.set("E6", "E6 - Higiene intensificada")
+ANSWERS.set("E6", "E6 - Higiene del personal intensificada")
 ANSWERS.set("E7", "E7 - Monitoreo diario del estado de salud avícola")
 
 const INIT_QUESTIONS: IAnswer[] = [QUESTIONS[0]]
@@ -195,64 +134,52 @@ function App() {
     setValue(null)
   }
 
+  const styles = {
+    box: {
+      background: 'url(/images/fondo.jpg) center top / cover transparent',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      width: '100vw',
+      minHeight: '100vh',
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh"
+    }
+
+  }
+
   return (
-    <Box 
-      sx={{
-        background: 'url(/images/fondo.jpg) center top / cover transparent',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        width: '100vw',
-        minHeight: '100vh'
-      }}
-    >
-      <CenteredContainer>
+    <Box sx={styles.box}>
         <Grid container direction="column" alignItems="center">
-          <Grid item>
-            <Typography
-              variant="h4"
-              mb={5}
-              sx={{
-                fontWeight: 700,
-                color: '#FFFFFF',
-              }}
-            >
-              Prevención Influenza Aviar
-            </Typography>
-          </Grid>
           <Grid item>
             <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
               {answers.length === 1 &&
                 <StartCard handleStart={handleStart}/> }
               {answers.length > 1 && answerId === "" &&
-                <QuestionForm 
-                  answer={answers[answers.length - 1]} 
+                <QuestionForm
+                  answer={answers[answers.length - 1]}
                   handleChange={handleChange}
                   handleBack={handleBack}
                   handleNext={handleNext}
                   handleReset={handleReset}
                   disableNext={value === null}
+                  imageUrl={"https://www.ospat.com.ar/wp-content/uploads/2023/04/pollo-blanco-granja.jpg"}
                 />
               }
-              {answerId !== "" && 
-                <SolutionCard 
-                  handleReset={handleReset} 
-                  answer={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"} 
-                /> 
+              {answerId !== "" &&
+                <SolutionCard
+                  handleReset={handleReset}
+                  answer={answerId !== null ? ANSWERS.get(answerId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
+                />
               }
             </Card>
           </Grid>
         </Grid>
-      </CenteredContainer>
     </Box>
   )
 }
 
-const CenteredContainer = styled(Container)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-`;
 
 export default App;

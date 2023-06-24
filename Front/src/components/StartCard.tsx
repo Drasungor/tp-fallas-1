@@ -5,7 +5,7 @@ import {
   CardContent,
   CardHeader,
   Button,
-  CardMedia
+  CardMedia, Typography
 } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
@@ -22,12 +22,15 @@ function StartCard ({handleStart}: Props) {
           height="300"
           image="https://i0.wp.com/www.corpmontana.com/blog/wp-content/uploads/2022/12/gripe-aviar-scaled.jpg?resize=1280%2C640&ssl=1"
         />
-      <CardHeader 
+      <CardHeader
         titleTypographyProps={{ align: 'center' }}
-        title={"Medida de prevención de influenza aviar"}
+        title={"Aviary Shield"}
       />
+      <Typography variant={"h6"} gutterBottom style={{ textAlign: 'center', marginLeft: 20, marginRight: 20 }}>
+        Sistema experto de medidas de prevención contra la influenza aviar
+      </Typography>
       <CardContent style={{ textAlign: 'center' }}>
-        A continuación deberá completar una seríe de preguntas respecto a las características de su negocio 
+        A continuación deberá completar una seríe de preguntas respecto a las características de su negocio
         y a partir de esto se podra determinar la medida de prevención contra la influenza aviar más adecuada para usted.
       </CardContent>
       <CardActions style={{ justifyContent: 'center' }}>
