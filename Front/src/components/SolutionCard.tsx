@@ -12,16 +12,17 @@ import RestartAlt from '@mui/icons-material/RestartAlt';
 type Props = {
   handleReset: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   answer?: string
+  img: string
 }
 
-function SolutionCard ({handleReset, answer}: Props) {
+function SolutionCard ({handleReset, answer, img}: Props) {
   return (
     <Card sx={{ width: '500pt', minHeight: 500 }} variant="outlined">
       <CardMedia
           component="img"
           alt="aves"
           height="300"
-          image="https://www.fincacasarejo.com/Docs/Noticias/madre.jpg"
+          image={img}
         />
       <CardHeader
         titleTypographyProps={{ align: 'center' }}

@@ -45,14 +45,19 @@ const QUESTIONS: IQuestion[] = [
 
 ]
 
-const ANSWERS = new Map<string, string>()
-ANSWERS.set("E1", "E1 - Confinamiento avícola.")
-ANSWERS.set("E2", "E2 - Evitar contacto con otras granjas.")
-ANSWERS.set("E3", "E3 - Indumentaria de bioseguridad.")
-ANSWERS.set("E4", "E4 - Disponer alimentos en lugares solo accesibles por las aves.")
-ANSWERS.set("E5", "E5 - Elementos de disipación de aves silvestres.")
-ANSWERS.set("E6", "E6 - Higiene del personal intensificada.")
-ANSWERS.set("E7", "E7 - Monitoreo diario del estado de salud avícola.")
+interface IAnswer {
+  answer: string
+  img: string
+}
+
+const ANSWERS = new Map<string, IAnswer>()
+ANSWERS.set("E1", {answer: "E1 - Confinamiento avícola.", img:"/images/e1_confinamiento.jpg"})
+ANSWERS.set("E2", {answer: "E2 - Evitar contacto con otras granjas.", img:"/images/e2_evitar_granjas.jpg"})
+ANSWERS.set("E3", {answer: "E3 - Indumentaria de bioseguridad.", img:"/images/e3_indumentaria.jpg"})
+ANSWERS.set("E4", {answer: "E4 - Disponer alimentos en lugares solo accesibles por las aves.", img:"/images/e4_alimento.jpg"})
+ANSWERS.set("E5", {answer: "E5 - Elementos de disipación de aves silvestres.", img:"/images/e5_aves_silvestres.jpg"})
+ANSWERS.set("E6", {answer: "E6 - Higiene del personal intensificada.", img:"/images/e6_higiene_personal.jpg"})
+ANSWERS.set("E7", {answer: "E7 - Monitoreo diario del estado de salud avícola.", img:"/images/e7_monitoreo.jpg"})
 
 const INIT_QUESTIONS: IQuestion[] = [QUESTIONS[0]]
 
@@ -135,6 +140,22 @@ function App() {
     setValue(null)
   }
 
+  const getAnswer = (questionIdP: string) => {
+    const answer = ANSWERS.get(questionIdP)
+    if (answer !== undefined) {
+      return answer.answer
+    }
+    return "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"
+  }
+
+  const getAnswerImg = (questionIdP: string) => {
+    const answer = ANSWERS.get(questionIdP)
+    if (answer !== undefined) {
+      return answer.img
+    }
+    return "https://www.fincacasarejo.com/Docs/Noticias/madre.jpg"
+  }
+
   const styles = {
     box: {
       background: 'url(/images/fondo.jpg) center top / cover transparent',
@@ -150,6 +171,8 @@ function App() {
     }
 
   }
+
+
 
   return (
     <Box sx={styles.box}>
@@ -173,7 +196,8 @@ function App() {
             {questionId !== "" &&
               <SolutionCard
                 handleReset={handleReset}
-                answer={questionId !== null ? ANSWERS.get(questionId) : "No se pudo encontrar una medida de prevención que se adecúe a las condiciones dadas"}
+                answer={getAnswer(questionId)}
+                img={getAnswerImg(questionId)}
               />
             }
           </Card>
