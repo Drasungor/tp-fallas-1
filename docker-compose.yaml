@@ -1,0 +1,23 @@
+version: '3'
+services:
+  my-python-app:
+    environment:
+      - PYTHONUNBUFFERED=1
+    build:
+      context: ./Back
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    # volumes:
+    #   - ./app:/app
+
+  my-frontend-app:
+    # environment:
+    #   - PYTHONUNBUFFERED=1
+    build:
+      context: ./Front
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    # volumes:
+    #   - ./app:/app
